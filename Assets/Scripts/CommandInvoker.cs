@@ -28,4 +28,6 @@ public class CommandInvoker : MonoBehaviour
            // commandBuffer.Dequeue().Movement();
         }
     }
+
+    //MEMENTO Pattern
 }
