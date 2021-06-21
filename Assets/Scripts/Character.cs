@@ -90,17 +90,31 @@ namespace EastBourne
                 anim.SetTrigger("takeOff");
                 anim.SetBool("isJumping", true);
                 charRB.velocity = Vector2.up * jumpForce;
+
+                Debug.Log("regular jump(without command)");
             }
           
         }
-       public void checkGround(bool isGrounded)
+
+        public void JumpCmd(bool isGrounded)
+        {
+            ICommand command = new JumpCommand(gameObject, jumpForce, isGrounded, anim);
+            CommandInvoker.AddCommand(command);
+        }
+
+        public void JumpTouchPad(bool isGrounded)
+        {
+            ICommand command = new JumpCommand(gameObject, jumpForce, isGrounded, anim);
+            CommandInvoker.AddCommand(command);
+        }
+
+        public void checkGround(bool isGrounded)
         {
             if (isGrounded)
                 anim.SetBool("isJumping", false);
             else
                 anim.SetBool("isJumping", true);
         }
-        
     }
 }
 

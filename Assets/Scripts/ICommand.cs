@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface ICommand
+namespace EastBourne
 {
-    void Movement();
-    void Jump();
-
+    public interface ICommand
+    {
+        void JumpExecute();
+    }
 }
+

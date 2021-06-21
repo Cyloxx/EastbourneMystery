@@ -30,12 +30,20 @@ namespace EastBourne
             if (Input.GetKeyDown(KeyCode.F))
                 ownedCharacter.Attack();
 
-          /*  if (Application.platform == RuntimePlatform.Android)
-                print("Android");
-            else if (Application.platform == RuntimePlatform.IPhonePlayer)
-                print("Iphone");*/
-
+            if (Input.GetKeyDown(KeyCode.X))
+            {
+                // jump command
+                ownedCharacter.JumpCmd(isGrounded);
+                Debug.Log("jump command sent by keyboard (command)");
+            }
+              
             ownedCharacter.checkGround(isGrounded);
+        }
+
+        public void JumpButton()
+        {
+            ownedCharacter.JumpTouchPad(isGrounded);
+            Debug.Log("jump command sent by touch screen (command)");
         }
 
         private void FixedUpdate()

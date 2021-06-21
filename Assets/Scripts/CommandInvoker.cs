@@ -2,32 +2,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CommandInvoker : MonoBehaviour
+namespace EastBourne
 {
-
-    static Queue<ICommand> commandBuffer;
-
-    private void Awake()
+    public class CommandInvoker : MonoBehaviour
     {
-        commandBuffer = new Queue<ICommand>();
 
-    }
+        static Queue<ICommand> commandBuffer;
+        public List<Queue> lookUpList;
 
-    public static void AddCommand(ICommand command)
-    {
-        commandBuffer.Enqueue(command);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if(commandBuffer.Count > 0)
+        private void Awake()
         {
-            ICommand c = commandBuffer.Dequeue();
-            c.Jump();
-           // commandBuffer.Dequeue().Movement();
+            commandBuffer = new Queue<ICommand>();
         }
-    }
 
-    //MEMENTO Pattern
+        public static void AddCommand(ICommand command)
+        {
+            commandBuffer.Enqueue(command);
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            if (commandBuffer.Count > 0)
+            {
+                ICommand c = commandBuffer.Dequeue();
+                c.JumpExecute();
+                // commandBuffer.Dequeue().Movement();
+            }
+        }
+
+        //MEMENTO Pattern
+    } 
 }
