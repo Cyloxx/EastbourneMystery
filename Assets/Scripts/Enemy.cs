@@ -39,13 +39,10 @@ namespace EastBourne
             health = val;
         }
 
-        public void AddHealth(int val)
-        {
-          
-        }
         public void RemoveHealth(int val)
         {
-           
+            anim.SetTrigger("takeDamage");
+            health -= val;
         }
 
         public void Attack()
@@ -91,19 +88,23 @@ namespace EastBourne
 
         }
 
-        public void JumpCmd(bool isGrounded)
-        {
-            ICommand command = new JumpCommand(gameObject, jumpForce, isGrounded, anim);
-            CommandInvoker.AddCommand(command);
-        }
-
-
         public void checkGround(bool isGrounded)
         {
             if (isGrounded)
                 anim.SetBool("isJumping", false);
             else
                 anim.SetBool("isJumping", true);
+        }
+
+
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (collision.gameObject.tag == "Attack Area")
+            {
+                health--;
+                if(health==0)
+                Destroy(gameObject);
+            }
         }
     }
 }

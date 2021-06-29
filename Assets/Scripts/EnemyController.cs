@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace EastBourne
 {
+     //AI works here
     public class EnemyController : CharacterController
     {
 
@@ -16,19 +17,28 @@ namespace EastBourne
         {
 
         }
-
         void Update()
         {
-            dummyEnemy.checkGround(isGrounded);
+            ownedCharacter.checkGround(isGrounded);
 
 
-            if (Input.GetKeyDown(KeyCode.L))
-            {
-                // jump command
-                dummyEnemy.JumpCmd(isGrounded);
-                Debug.Log("Enemy jump command sent by keyboard (command)");
-            }
+            //if (Input.GetKeyDown(KeyCode.L))
+            //{
+            //    // jump command
+            //    //ownedCharacter.JumpCmd(isGrounded);
+            //    Debug.Log("Enemy jump command sent by keyboard (command)");
+            //}
+
+            //patrolling state:
+            //  move to next patrolling position
         }
+
+        private void FixedUpdate()
+        {
+            isGrounded = Physics2D.OverlapCircle(feetPos.position, checkRadius, whatIsGround);
+        }
+
+
     }
 }
 

@@ -6,57 +6,63 @@ namespace EastBourne
 {
     public class PlayerController : CharacterController
     {
+        [SerializeField] private GameInputs gameInputs;
+
         public float movementInput;
         public bool isGrounded;
+        public bool invulnerable;
         private float checkRadius = 0.1f;
         public LayerMask whatIsGround;
-        public Transform feetPos;
+        public Transform feetTransform;
+        public GameObject wallCheck;
+        
 
         void Start()
         {
             ownedCharacter.AttackPower = 5;
+            ownedCharacter.SetAttack = true;
+            ownedCharacter.SetSecondAttack = false;
+            invulnerable = false;
         }
         
         void Update()
         {
-            if (Mathf.Abs(movementInput) != 0)
+            if (Mathf.Abs(gameInputs.GetMove()) != 0)
                 ownedCharacter.Move(movementInput);
             else
                 ownedCharacter.Idle();
 
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (gameInputs.GetJump())
                 ownedCharacter.Jump(isGrounded);
 
-            if (Input.GetKeyDown(KeyCode.F))
+            if (gameInputs.GetAttack())
                 ownedCharacter.Attack();
 
-            if (Input.GetKeyDown(KeyCode.X))
-            {
-                // jump command
-                ownedCharacter.JumpCmd(isGrounded);
-                Debug.Log("jump command sent by keyboard (command)");
-            }
-              
             ownedCharacter.checkGround(isGrounded);
-        }
-
-        public void JumpButton()
-        {
-            ownedCharacter.JumpTouchPad(isGrounded);
-            Debug.Log("jump command sent by touch screen (command)");
         }
 
         private void FixedUpdate()
         {
-            movementInput = Input.GetAxisRaw("Horizontal");
-            isGrounded = Physics2D.OverlapCircle(feetPos.position, checkRadius, whatIsGround);
+            movementInput = gameInputs.GetMove();
+            isGrounded = Physics2D.OverlapCircle(feetTransform.position, checkRadius, whatIsGround);
         }
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            if (collision.gameObject.tag == "Enemy")
+            if (collision.gameObject.tag == "Enemy" && invulnerable == false)
+            {
+                invulnerable = true;
                 ownedCharacter.RemoveHealth(1);
+                StartCoroutine(invulnerableCounter());
+            }
+            
         }
+        IEnumerator invulnerableCounter()
+        {
+            yield return new WaitForSeconds(0.5f);
+            invulnerable = false;
+        }
+
         private void OnTriggerEnter2D(Collider2D collision)
         {
             if(collision.gameObject.tag == "Health")

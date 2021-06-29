@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - Health
   - Attack Area
+  - Wall
   layers:
   - Default
   - TransparentFX
