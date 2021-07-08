@@ -7,4 +7,5 @@ public abstract class PlatformInputs : MonoBehaviour
     public abstract bool GetJump();
     public abstract bool GetAttack();
     public abstract float GetMove();
+
 }

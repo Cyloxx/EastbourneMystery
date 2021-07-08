@@ -14,14 +14,14 @@ namespace EastBourne
         private float checkRadius = 0.1f;
         public LayerMask whatIsGround;
         public Transform feetTransform;
-        public GameObject wallCheck;
         
 
         void Start()
         {
+            ownedCharacter = GetComponent<Character>();
             ownedCharacter.AttackPower = 5;
-            ownedCharacter.SetAttack = true;
-            ownedCharacter.SetSecondAttack = false;
+            ownedCharacter.AttackReady = true;
+            ownedCharacter.SecondAttackReady = false;
             invulnerable = false;
         }
         
@@ -52,9 +52,14 @@ namespace EastBourne
             if (collision.gameObject.tag == "Enemy" && invulnerable == false)
             {
                 invulnerable = true;
-                ownedCharacter.RemoveHealth(1);
+                ownedCharacter.TakeDamage();
                 StartCoroutine(invulnerableCounter());
             }
+            if (collision.gameObject.tag == "Death")
+            {
+                ownedCharacter.Died();
+            }
+
             
         }
         IEnumerator invulnerableCounter()
@@ -71,6 +76,18 @@ namespace EastBourne
                 ownedCharacter.AddHealth(1);
             }
         }
+      /*  void OnTriggerStay2D(Collider2D col)
+        {
+            if (col.gameObject.layer == LayerMask.NameToLayer("Ground"))
+            {
+                if (isRightSensor)
+                    character.AddForce(new Vector2(-bounceForce, 0));
+                else
+                    character.AddForce(new Vector2(bounceForce, 0));
+            }
+
+        }*/
+
 
     }
 }

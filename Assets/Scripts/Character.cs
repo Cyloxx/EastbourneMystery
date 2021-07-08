@@ -8,22 +8,30 @@ namespace EastBourne
     public class Character : MonoBehaviour
     {
 
-        [SerializeField] private Animator anim;
-        [SerializeField] private Rigidbody2D charRB;
-        [SerializeField] private TMP_Text healthText;
-        [SerializeField] private GameObject attackArea1;
-        [SerializeField] private GameObject attackArea2;
-        [SerializeField] private int health;
-        [SerializeField] private float movementSpeed;
-        [SerializeField] private float jumpForce;   
-        [SerializeField] private bool attackReady;
-        [SerializeField] private bool secondAttackReady;
+        [SerializeField] protected Animator anim;
+        [SerializeField] protected Rigidbody2D charRB;
+        [SerializeField] protected TMP_Text healthText;
+        [SerializeField] protected GameObject attackArea1;
+        [SerializeField] protected GameObject attackArea2;
+        [SerializeField] protected int health;
+        [SerializeField] protected float movementSpeed;
+        [SerializeField] protected float jumpForce;
+        [SerializeField] protected bool attackReady;
+        [SerializeField] protected bool secondAttackReady;
+        [SerializeField] protected bool doubleJumpReady;
+        [SerializeField] protected bool controllable;
+        [SerializeField] protected int randomizer;
+
+        protected Coroutine attackRoutine;
 
         private int attackPower;
-        public void Start()
+        protected virtual void Start()
         {
+            controllable = true;
             attackReady = true;
             secondAttackReady = false;
+            doubleJumpReady = false;
+
         }
         public int AttackPower
         {
@@ -37,7 +45,7 @@ namespace EastBourne
             }
         }
 
-        public bool SetAttack
+        public bool AttackReady
         {
             get
             {
@@ -48,7 +56,7 @@ namespace EastBourne
                 attackReady = value;
             }
         }
-        public bool SetSecondAttack
+        public bool SecondAttackReady
         {
             get
             {
@@ -56,7 +64,7 @@ namespace EastBourne
             }
             set
             {
-                attackReady = false;
+                secondAttackReady = false;
             }
         }
 
@@ -72,76 +80,114 @@ namespace EastBourne
 
         public void AddHealth(int val)
         {
-            health += val;
-            healthText.SetText("Health: " + health);
-            anim.SetTrigger("getHeal");
+            if (controllable)
+            {
+                health += val;
+                healthText.SetText("Health: " + health);
+                anim.SetTrigger("getHeal");
+            }
+            
         }
         public void RemoveHealth(int val)
         {
             anim.SetTrigger("takeDamage");
             health -= val;
-            healthText.SetText("Health: " + health);
+            if(healthText!=null)
+                healthText.SetText("Health: " + health);
         }
 
         public void Attack()
         {
-            if (attackReady)
+            if (controllable)
             {
-                 StartCoroutine(performAttack());
+                if (attackReady)
+                {
+                    PerformAttack();
+                }
+                if (secondAttackReady && attackArea2 != null)
+                    PerformSecondAttack();
             }
-            if(secondAttackReady && attackArea2!=null)
-                 StartCoroutine(performSecondAttack());
 
         }
-        IEnumerator performAttack()
+
+        public virtual void PerformAttack()
         {
-            anim.SetTrigger("isAttacking");
-            attackArea1.SetActive(true);
-            attackReady = false;
-            yield return new WaitForSeconds(0.3f);
-            attackArea1.SetActive(false);
-            secondAttackReady = true;
-            yield return new WaitForSeconds(0.2f);
-            attackReady = true;
-            secondAttackReady = false;
+
         }
-        IEnumerator performSecondAttack()
+
+        public virtual void PerformSecondAttack()
         {
-            anim.SetTrigger("isAttacking2");
-            attackArea2.SetActive(true);
-            secondAttackReady = false;
-            yield return new WaitForSeconds(0.2f);
-            attackArea2.SetActive(false);
+
+        }
+
+        public void TakeDamage()
+        {
+            anim.SetTrigger("takeDamage");
+            RemoveHealth(1);
+            if(GetHealth() == 0)
+            {
+                Died();
+            }
+        }
+
+
+        public  virtual void Died()
+        {
+            
         }
 
         public void Move(float side)
         {
-            float yAngle = side > 0 ? 0 : 180;
+            if (controllable)
+            {
+                float yAngle = side > 0 ? 0 : 180;
 
-            transform.eulerAngles = new Vector3(0, yAngle, 0);
-            anim.SetBool("isRunning", Mathf.Abs(side) > 0);
-            charRB.velocity = new Vector2(side * movementSpeed * Time.timeScale, charRB.velocity.y);
+                transform.eulerAngles = new Vector3(0, yAngle, 0);
+                anim.SetBool("isRunning", Mathf.Abs(side) > 0);
+                charRB.velocity = new Vector2(side * movementSpeed * Time.timeScale, charRB.velocity.y); 
+            }
 
         }
         public void Idle()
         {
-            anim.SetBool("isRunning", false);
+            if (controllable)
+            {
+                anim.SetBool("isRunning", false); 
+            }
         }
 
         public void Jump(bool isGrounded)
         {
-            if (isGrounded)
+            if (controllable)
             {
-                anim.SetTrigger("takeOff");
-                anim.SetBool("isJumping", true);
-                charRB.velocity = Vector2.up * jumpForce;
+                if (isGrounded)
+                {
+                    anim.SetTrigger("takeOff");
+                    anim.SetBool("isJumping", true);
+                    charRB.velocity = Vector2.up * jumpForce;
+                    StartCoroutine(doubleJumpCounter());
+
+                }
+                else if (!isGrounded && doubleJumpReady)
+                {
+                    anim.SetBool("isJumping", true);
+                    charRB.velocity = Vector2.up * jumpForce;
+                    doubleJumpReady = false;
+                } 
             }
         }
-
+        IEnumerator doubleJumpCounter()
+        {
+            yield return new WaitForSeconds(0.1f);
+            doubleJumpReady = true;
+        }
         public void checkGround(bool isGrounded)
         {
-            if (isGrounded)
+            if (isGrounded) {
                 anim.SetBool("isJumping", false);
+                doubleJumpReady = false;
+            }
+                
             else
                 anim.SetBool("isJumping", true);
         }

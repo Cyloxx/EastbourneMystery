@@ -9,6 +9,7 @@ TagManager:
   - Health
   - Attack Area
   - Wall
+  - Death
   layers:
   - Default
   - TransparentFX
